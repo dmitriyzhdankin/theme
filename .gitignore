@@ -14,3 +14,4 @@ wp-content/backups/
 sitemap.xml.gz
 /nbproject/private/
 nbproject/
+googleddbc*
