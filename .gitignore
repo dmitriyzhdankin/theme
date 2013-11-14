@@ -1,5 +1,6 @@
 .htaccess
 wp-config.php
+uploads/
 wp-content/uploads/
 wp-content/blogs.dir/
 wp-content/upgrade/
@@ -11,3 +12,5 @@ sitemap.xml
 wp-content/cache/
 wp-content/backups/
 sitemap.xml.gz
+/nbproject/private/
+nbproject/
