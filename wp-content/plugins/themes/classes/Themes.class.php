@@ -47,7 +47,7 @@ abstract class Themes {
         if( !$this->getNotLoadedPages() ) {
             $this->addPagesWithThemes();
         }
-        die('Pages didnt was load');
+        die('Pages didnt was load from site '.$this->site_name);
     }
     
     public function LoadThemesFromPages() { // run from cron
@@ -57,7 +57,7 @@ abstract class Themes {
                 $this->insertThemesFromPage($page);
                 unset($pages_list[$key]);
                 $this->updatePagesList($pages_list);
-                die;
+                die('themes was loaded from page '.$key.' of site '.$this->site_name);
             }
         }
     }
@@ -193,16 +193,17 @@ abstract class Themes {
         $query = 'UPDATE '. $this->parsed_themes_table .' SET loaded = 1 WHERE id = '.$this->theme_options['id'];
         return $this->db->query($query);
     }
-    
-    private function getNotLoadedTheme() {
-        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 LIMIT 0,1';
-        $this->theme_options = $this->db->get_row( $query, ARRAY_A );
-    }
+//    04.12 deleted after test
+//    private function getNotLoadedTheme() {
+//        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 LIMIT 0,1';
+//        $this->theme_options = $this->db->get_row( $query, ARRAY_A );
+//    }
     protected function addPagesWithThemes() {
         $this->getPageHtml( $this->source_site );      
         $pages_list = $this->createPagesList();
         $this->updatePagesList($pages_list);
-        die('pages list was loaded');
+        $this->setLastParsed();
+        die('pages list was loaded from site '.$this->site_name);
     }
     
     protected function updatePagesList($pages_list) {
@@ -217,11 +218,19 @@ abstract class Themes {
     
     protected function setPagesList( $pages ) {
         $table_name = $this->db->prefix.'options';
-
         if( $this->getNotLoadedPages() === null ) {
             $this->db->insert( $table_name,  array('option_name' => 'not_loaded_pages', 'option_value' => $pages ) );
         } else {
             $this->db->update( $table_name,  array( 'option_value' => $pages ), array( 'option_name' => 'not_loaded_pages' ) );
+        }
+    }
+    
+    private function setLastParsed() {
+        $table_name = $this->db->prefix.'options';
+        if( getLastParsedSource() ) {
+            $this->db->update( $table_name,  array( 'option_value' => $this->site_name ), array( 'option_name' => 'last_parsed' ) );
+        } else {
+            $this->db->insert( $table_name,  array('option_name' => 'last_parsed', 'option_value' => $this->site_name ) );
         }
     }
     
