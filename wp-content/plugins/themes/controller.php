@@ -84,7 +84,7 @@ function downloadTheme() {
     die;
 }
 function parsingPage() {
-    if(!$source_for_parsing = getSourceForNewPars()) {
+    if(!$source_for_parsing = getLastParsedSource()) {
         die('Not have source for parsing');
     }
     $tmp = eval('$parser = new '.$source_for_parsing."();");
