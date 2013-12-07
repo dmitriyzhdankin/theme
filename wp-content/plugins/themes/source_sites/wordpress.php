@@ -1,10 +1,46 @@
 <?php
-class Wordpress extends Theme {
+class Wordpress extends Themes {
     public $source_site = 'http://wordpress.org';
     public $site_name = 'wordpress';
-
-    protected function getDescription() {
-        $el_description = $this->theme_page_html->find('.block-content');
+    
+    private $path_to_filters = '/themes/tag-filter/';
+    
+    public function createPagesList() {
+        $this->getPageHtml( $this->source_site. $this->path_to_filters ); // only for WP
+        $pages_list = array();
+        foreach($this->page_content->find('#tag-filter-form input[type=checkbox]') as $checkbox ) {
+            $pages_list[$checkbox->name] = $checkbox->value;
+        }
+        return $pages_list;
+    }
+ 
+    public function getSourceThemesSelector(){
+        return '#theme-list .available-theme';
+    }
+    public function getSourcePageUrl($page_number){
+        return array(
+            'url' => $this->source_site.$this->path_to_filters,
+            'post_fields' => array('tags['.$page_number.']' => $page_number)
+        );
+    }
+    public function getSourceNameFromList(){
+        return $this->currentSourceThemeHtml->find('a.activatelink[target=_blank]', 0)->innertext;
+    }
+    public function getSourceUrlFromList(){
+        return $this->source_site.$this->currentSourceThemeHtml->find('a.activatelink[target=_blank]', 0)->href;   
+    }
+    public function getSourceZipUrlFromList(){ 
+        return $this->source_site.$this->currentSourceThemeHtml->find('span a.activatelink', 0)->href;
+    }
+    public function getSourceDemoUrlFromList(){ 
+        return $this->currentSourceThemeHtml->find('a.previewlink', 0)->href;
+    }
+    public function getSourceScreenshotUrlFromList(){ 
+        return $this->currentSourceThemeHtml->find('a.previewlink img', 0)->src;
+    }
+    
+    public function getDescription(){ 
+        $el_description = $this->page_content->find('.block-content');
         $description = '';
         if( $el_description ) {
             $description = $el_description[0]->text();
@@ -15,26 +51,20 @@ class Wordpress extends Theme {
         }
         return $description;
     }
-
-    protected function getTags() {
+    public function getTags(){         
         $tags = array();
-        foreach( $this->theme_page_html->find('.block-content #plugin-tags a') as $tag ) {
+        foreach( $this->page_content->find('.block-content #plugin-tags a') as $tag ) {
             $tags[] = $tag->innertext;
         }
         return $tags;
     }
-
-    protected function getLocalZip() {
-        $local_zip =  $this->local_zip_path.basename($this->theme_options['zip_url']);
-        file_put_contents(ABSPATH.$local_zip, fopen($this->theme_options['zip_url'], 'r'));
-        return $local_zip;
+    public function getZipUrl() {
+        return $this->theme_options['zip_url'];
     }
-
-    protected function getLocalPreview() {
+    public function getPreviewUrl() {
         return $this->theme_options['preview'];
     }
-
-    protected function getThumbnail() {
+    public function getThumbnailUrl() {
         return $this->theme_options['screenshot'];
     }
 }

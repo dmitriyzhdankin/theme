@@ -2,7 +2,7 @@
 global $avaiable_source;
 $avaiable_source = array(
     'smthemes' => 1,
-    'wordpress' => 0,
+    'wordpress' => 1,
     'fwpthemes' => 1,
 ); 
 
@@ -97,7 +97,7 @@ function parsingSource() {
     if(!$source_for_parsing = getSourceForNewPars()) {
         die('Not have source for parsing');
     }
-    
+
     $tmp = eval('$parser = new '.$source_for_parsing."();");
     if( $parser ) {
         $parser->loadNewPagesWithThemes();

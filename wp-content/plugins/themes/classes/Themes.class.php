@@ -69,12 +69,12 @@ abstract class Themes {
 
         $this->getPageHtml($this->theme_options['url']);      
 
-        $this->theme_options['theme_name'] = $this->getName();
-        $this->theme_options['theme_description'] = $this->getDescription();
+        $this->theme_options['theme_name'] = trim($this->getName());
+        $this->theme_options['theme_description'] = trim($this->getDescription());
         $this->theme_options['theme_tags'] = $this->getTags();
-        $this->theme_options['theme_local_zip'] = $this->getLocalZip();
-        $this->theme_options['theme_local_preview'] = $this->getLocalPreview();
-        $this->theme_options['theme_local_thumbnail'] = $this->getThumbnailUrl();
+        $this->theme_options['theme_local_zip'] = trim($this->getLocalZip());
+        $this->theme_options['theme_local_preview'] = trim($this->getLocalPreview());
+        $this->theme_options['theme_local_thumbnail'] = trim($this->getThumbnailUrl());
     }
     
     protected function getName() {
@@ -190,7 +190,7 @@ abstract class Themes {
     }
     
     public function setThemeIsDownloaded() {
-        $query = 'UPDATE '. $this->parsed_themes_table .' SET loaded = 1 WHERE id = '.$this->theme_options['id'];
+        $query = 'UPDATE '. $this->parsed_themes_table .' SET loaded = 1, date_loaded = "'.date('Y-m-d H:i:s').'" WHERE id = '.$this->theme_options['id'];
         return $this->db->query($query);
     }
 //    04.12 deleted after test
@@ -272,6 +272,7 @@ abstract class Themes {
             'preview' => $theme['preview'],
             'screenshot' => $theme['screenshot'],
             'site_name' => $theme['site_name'],
+            'added' => date('Y-m-d H:i:s'),
         );
         return $this->db->insert($this->parsed_themes_table,$data);
     }
@@ -280,14 +281,27 @@ abstract class Themes {
         $this->getPageHtml( $this->getSourcePageUrl($page_number) );
     }
     
-    private function getPageHtml($url, $post_fields = array()) {
+    protected function getPageHtml( $params ) {
+        $url = false;
+        $post_fields = array();
+        if(is_string($params)) {
+            $url = $params;
+        } elseif(is_array($params)) {
+            if(isset($params['url'])) {
+               $url = $params['url'];
+            }
+            if(isset($params['post_fields'])) {
+                $post_fields = $params['post_fields'];
+            }
+        }
+        if(!$url) {return false;}
+        
         $page = $this->loadPage( $url, $post_fields );
         $page_content = $page['content'];
         $this->page_content = str_get_html($page_content);
     }
     
     private function loadPage( $url, $post_fields = array() ) {
-        $headers = array('Content-type: text/html; charset=utf-8');
         $uagent="Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.9.0.8) Gecko/2009032609 Firefox/3.0.9";
         $ch = curl_init( $url );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -298,13 +312,15 @@ abstract class Themes {
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         if( $post_fields ) {
             $post_fields_string = '';
             foreach($post_fields as $key=>$value) { $post_fields_string .= $key.'='.$value.'&'; }
             rtrim($post_fields_string, '&');
             curl_setopt($ch,CURLOPT_POST, count($post_fields));
             curl_setopt($ch,CURLOPT_POSTFIELDS, $post_fields_string);
+        } else {
+            $headers = array('Content-type: text/html; charset=utf-8');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
         $content=curl_exec( $ch );
         $err=curl_errno( $ch );
@@ -317,3 +333,7 @@ abstract class Themes {
         return $header;
     }
 }
+/*
+ALTER TABLE `themes` ADD `added` TIMESTAMP NULL DEFAULT NULL ,
+ADD `date_loaded` TIMESTAMP NULL DEFAULT NULL ;
+ */
