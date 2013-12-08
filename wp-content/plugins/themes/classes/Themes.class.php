@@ -153,10 +153,11 @@ abstract class Themes {
         $upload_dir = wp_upload_dir();
         $image_data = file_get_contents($image_url);
         $filename = $post_id.'_'.basename($image_url);
-        if(wp_mkdir_p($upload_dir['path']))
+        if(wp_mkdir_p($upload_dir['path'])) {
             $file = $upload_dir['path'] . '/' . $filename;
-        else
+        } else {
             $file = $upload_dir['basedir'] . '/' . $filename;
+        }
         file_put_contents($file, $image_data);
 
         $wp_filetype = wp_check_filetype($filename, null );
@@ -193,17 +194,13 @@ abstract class Themes {
         $query = 'UPDATE '. $this->parsed_themes_table .' SET loaded = 1, date_loaded = "'.date('Y-m-d H:i:s').'" WHERE id = '.$this->theme_options['id'];
         return $this->db->query($query);
     }
-//    04.12 deleted after test
-//    private function getNotLoadedTheme() {
-//        $query = 'SELECT * FROM '.$this->parsed_themes_table .' WHERE loaded = 0 LIMIT 0,1';
-//        $this->theme_options = $this->db->get_row( $query, ARRAY_A );
-//    }
+
     protected function addPagesWithThemes() {
         $this->getPageHtml( $this->source_site );      
         $pages_list = $this->createPagesList();
         $this->updatePagesList($pages_list);
         $this->setLastParsed();
-        die('pages list was loaded from site '.$this->site_name);
+        die( count($pages_list).' pages list was loaded from site '.$this->site_name);
     }
     
     protected function updatePagesList($pages_list) {
@@ -333,7 +330,3 @@ abstract class Themes {
         return $header;
     }
 }
-/*
-ALTER TABLE `themes` ADD `added` TIMESTAMP NULL DEFAULT NULL ,
-ADD `date_loaded` TIMESTAMP NULL DEFAULT NULL ;
- */

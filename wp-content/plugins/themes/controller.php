@@ -4,6 +4,7 @@ $avaiable_source = array(
     'smthemes' => 1,
     'wordpress' => 1,
     'fwpthemes' => 1,
+    'rockkitty' => 1,
 ); 
 
 $url = $_SERVER['REQUEST_URI'];
@@ -28,42 +29,6 @@ if( $url ) {
                 parsingPage();
                 break;
             }
-//            deleted after test
-//            
-//            case 'fwpthemes' : {
-//                $theme = new Fwpthemes();
-//                $theme->loadNewPagesWithThemes();
-//                break;
-//            }
-//            case 'load_fwpthemes' : {
-//                $theme = new Fwpthemes();
-//                $theme->LoadThemesFromPages();
-//                break;
-//            }
-//            
-//            case 'smthemes_get_themes' : {
-//                $smt = new Smthemes();
-//                $smt->LoadThemesFromPages();
-//                //$smt->loadNewPagesWithThemes();
-//                break;
-//            }
-//            
-//            case 'rockkitty_get_themes' : {
-//                $rk = new Rockkitty();
-//                $rk->getThemes();
-//                break;
-//            }
-//
-//            case 'wordpress_get_filters' : {
-//                $wp = new Wordpress();
-//                $wp->_getFilters();
-//                break;
-//            }
-//            case 'wordpress_get_themes' : {
-//                $wp = new Wordpress();
-//                $wp->_getThemes();
-//                break;
-//            }
         }
         die;
     }
