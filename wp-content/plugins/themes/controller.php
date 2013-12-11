@@ -5,6 +5,7 @@ $avaiable_source = array(
     'wordpress' => 1,
     'fwpthemes' => 1,
     'rockkitty' => 1,
+	'fabthemes' => 1,
 ); 
 
 $url = $_SERVER['REQUEST_URI'];
